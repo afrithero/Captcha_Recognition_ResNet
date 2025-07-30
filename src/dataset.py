@@ -130,13 +130,11 @@ def parse_submission(root_path):
 
 
 if __name__ == "__main__":
-	# 驗證能否正確解析 training set
 	df = parse_annotation(data_config.ROOT_PATH)
 	df_train, df_val = split_train_val(df, random_seed=42)
 	train_ds = CaptchaDataset(data_config.ROOT_PATH, df_train)
 	train_dl = DataLoader(train_ds, batch_size=100, num_workers=4, drop_last=True, shuffle=True)
 	
-	# 驗證能否正確解析 testing set
 	df = parse_submission(data_config.ROOT_PATH)
 	test_ds = CaptchaDataset(data_config.ROOT_PATH, df, is_predict=True)
 	test_dl = DataLoader(test_ds, batch_size=100, num_workers=4, drop_last=True, shuffle=True)

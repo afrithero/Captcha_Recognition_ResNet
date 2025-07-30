@@ -26,14 +26,14 @@ def decode(vec):
 
 
 if __name__ == '__main__':
-		# Verify that encoding a string into a neural network’s input and decoding the network’s output back into a string works correctly.
-		print(data_config.CAPTCHA_TO_INDEX_DICT)
-		vec_1 = encode("Q")
-		vec_2 = encode("0B")
-		vec_3 = encode("pO4B")
-		vecs = np.array([vec_1,vec_2,vec_3])
-		vecs = torch.tensor(vecs, dtype=torch.float)
-		c0 = np.argmax(vecs[1, 0:data_config.ALL_CHAR_SET_LEN].numpy())
-		c1 = np.argmax(vecs[1, data_config.ALL_CHAR_SET_LEN:2*data_config.ALL_CHAR_SET_LEN].numpy())
-		print(data_config.INDEX_TO_CAPTCHA_DICT[c0])
-		print(data_config.INDEX_TO_CAPTCHA_DICT[c1])
+	# Verify that encoding a string into a neural network’s input and decoding the network’s output back into a string works correctly.
+	print(data_config.CAPTCHA_TO_INDEX_DICT)
+	vec_1 = encode("Q")
+	vec_2 = encode("0B")
+	vec_3 = encode("pO4B")
+	vecs = np.array([vec_1,vec_2,vec_3])
+	vecs = torch.tensor(vecs, dtype=torch.float)
+	c0 = np.argmax(vecs[1, 0:data_config.ALL_CHAR_SET_LEN].numpy())
+	c1 = np.argmax(vecs[1, data_config.ALL_CHAR_SET_LEN:2*data_config.ALL_CHAR_SET_LEN].numpy())
+	print(data_config.INDEX_TO_CAPTCHA_DICT[c0])
+	print(data_config.INDEX_TO_CAPTCHA_DICT[c1])
