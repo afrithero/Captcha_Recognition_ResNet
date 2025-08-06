@@ -85,10 +85,10 @@ class Trainer:
 
         correct = 0
         total   = 0
-        loop = tqdm(self.val_loader, desc="Evaluate", leave=False)
+        batches = tqdm(self.val_loader, desc="Evaluate", leave=False)
 
         with torch.no_grad():
-            for images, labels, fnames in loop:
+            for images, labels, fnames in batches:
                 images = images.to(self.device)
                 preds  = self.model(images).cpu().numpy()
                 true   = data_encoding.decode(labels.numpy()[0])
@@ -109,7 +109,7 @@ class Trainer:
                     correct += 1
                 total += 1
 
-                loop.set_description(f"[T:{true}|P:{pred_str}]")
+                batches.set_description(f"[T:{true}|P:{pred_str}]")
                 tqdm.write(f"{fnames[0]} → True:{true}, Pred:{pred_str}")
 
         acc = correct / total if total>0 else 0
@@ -147,9 +147,9 @@ class Trainer:
         )
 
         preds = []
-        loop = tqdm(test_dl, total=len(test_dl), desc="Predict", leave=False)
+        batches = tqdm(test_dl, total=len(test_dl), desc="Predict", leave=False)
         with torch.no_grad():
-            for images, labels, fnames in loop:
+            for images, labels, fnames in batches:
                 images = images.to(self.device)
                 pred_probs = self.model(images).cpu().numpy()
                 length = int(labels.numpy()[0])
@@ -163,8 +163,8 @@ class Trainer:
                 pred_str = ''.join(chars)
                 preds.append(pred_str)
 
-                loop.set_description(f"[len:{length}|pred:{pred_str}]")
-                loop.set_postfix(file=fnames)
+                batches.set_description(f"[len:{length}|pred:{pred_str}]")
+                batches.set_postfix(file=fnames)
 
         df_test['label'] = preds
         df_test.to_csv(submission_path, index=False)

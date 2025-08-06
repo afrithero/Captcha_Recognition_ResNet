@@ -12,31 +12,31 @@ from sklearn.model_selection import train_test_split
 
 
 class CaptchaDataset(Dataset):
-		def __init__(self, root_path, df, is_predict=False):
-			self.root_path = root_path
-			self.data = df["filename"].tolist()
-			raw_labels = df["label"].tolist()
-			self.is_predict = is_predict
-			if is_predict:
-				self.labels = np.array(raw_labels)
-			else:
-				self.labels = np.array([data_encoding.encode(label) for label in raw_labels])
-			
-		def __getitem__(self, index):
-			file_name, label = self.data[index], self.labels[index]
-			
-			if self.is_predict:
-				img = cv2.imread(join(self.root_path, "dataset", "test", file_name),  cv2.IMREAD_GRAYSCALE)
-			else:
-				img = cv2.imread(join(self.root_path, "dataset", "train", file_name),  cv2.IMREAD_GRAYSCALE)
+	def __init__(self, root_path, df, is_predict=False):
+		self.root_path = root_path
+		self.data = df["filename"].tolist()
+		raw_labels = df["label"].tolist()
+		self.is_predict = is_predict
+		if is_predict:
+			self.labels = np.array(raw_labels)
+		else:
+			self.labels = np.array([data_encoding.encode(label) for label in raw_labels])
+		
+	def __getitem__(self, index):
+		file_name, label = self.data[index], self.labels[index]
+		
+		if self.is_predict:
+			img = cv2.imread(join(self.root_path, "dataset", "test", file_name),  cv2.IMREAD_GRAYSCALE)
+		else:
+			img = cv2.imread(join(self.root_path, "dataset", "train", file_name),  cv2.IMREAD_GRAYSCALE)
 
-			img = img.reshape(img.shape[0],img.shape[1], -1)
-			img = (img - 128) / 128
-			img = np.transpose(img,(2,0,1)) #因為 Conv2D channel 要在第一個 dim，所以做轉換
-			return torch.tensor(img,dtype=torch.float), torch.tensor(label, dtype=torch.float), file_name
-			
-		def __len__(self):
-			return len(self.data)
+		img = img.reshape(img.shape[0],img.shape[1], -1)
+		img = (img - 128) / 128
+		img = np.transpose(img,(2,0,1)) #因為 Conv2D channel 要在第一個 dim，所以做轉換
+		return torch.tensor(img,dtype=torch.float), torch.tensor(label, dtype=torch.float), file_name
+		
+	def __len__(self):
+		return len(self.data)
 
 		
 def split_train_val(df, random_seed=42):
@@ -127,14 +127,3 @@ def parse_submission(root_path):
 	df['label'] = df['filename'].apply(assign_label_len)
 	
 	return df
-
-
-if __name__ == "__main__":
-	df = parse_annotation(data_config.ROOT_PATH)
-	df_train, df_val = split_train_val(df, random_seed=42)
-	train_ds = CaptchaDataset(data_config.ROOT_PATH, df_train)
-	train_dl = DataLoader(train_ds, batch_size=100, num_workers=4, drop_last=True, shuffle=True)
-	
-	df = parse_submission(data_config.ROOT_PATH)
-	test_ds = CaptchaDataset(data_config.ROOT_PATH, df, is_predict=True)
-	test_dl = DataLoader(test_ds, batch_size=100, num_workers=4, drop_last=True, shuffle=True)

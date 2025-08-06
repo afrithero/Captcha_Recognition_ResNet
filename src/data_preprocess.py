@@ -24,6 +24,7 @@ def generate_augmented_data(path, count):
 	return p
 
 if __name__ == '__main__':
+	# Manually generate augmented data and then move the files.
 	task1_path = join(data_config.ROOT_PATH, "dataset", "train", "task1")
 	task1_count = len(os.listdir(task1_path))
 	p = generate_augmented_data(task1_path,task1_count)
