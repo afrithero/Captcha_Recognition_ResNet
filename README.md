@@ -22,9 +22,30 @@ An example is shown below, where the target output is '0751'. Each digit is high
 - ResNet-based architecture
 - Supports multi-character Captcha prediction
 
-## Coming Soon
-- Training script and dataset preparation
-- Evaluation metrics
-- Model optimization and deployment guide
+---
+## Environment Setup
+```bash
+pip install -r requirement.txt
+```
+## Data Preparation 
+This project uses the **Captcha Hacker 2023 Spring** dataset from Kaggle.
+### Step 1. 
+- Go to your Kaggle account → Account → Create New API Token
+- A file named kaggle.json will be downloaded
+- Place it under ~/.kaggle/
+### Step 2. 
+```bash
+kaggle competitions download -c captcha-hacker-2023-spring
+unzip captcha-hacker-2023-spring.zip
+```
+The directory named dataset should be placed under the root level of this repository.
 
-Stay tuned for updates!
+## Data Preprocessing
+
+This project includes a reproducible preprocessing pipeline to (1) **augment** the training images and (2) **denoise** them for more robust training. The script is `src/data_preprocess.py`. It operates on three tasks stored under `dataset/train/{task1,task2,task3}`.
+```bash
+python data_preprocess.py
+```
+
+## Coming Soon
+- How to train and evaluate.
