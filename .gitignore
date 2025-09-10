@@ -1,0 +1,6 @@
+__pycache__/
+dataset/
+.DS_Store
+nohup.out
+*.csv
+*.pkl
