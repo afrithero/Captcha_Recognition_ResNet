@@ -19,7 +19,6 @@ class ResidualBlock(nn.Module):
 			nn.BatchNorm2d(outchannel, track_running_stats = True))
 		self.shortcut = nn.Sequential()
 
-		# 如果 input 和 output 維度不一樣，不能直接相加，所以要再做一次卷積
 		if stride != 1 or inchannel != outchannel:
 			self.shortcut = nn.Sequential(
 				nn.Conv2d(inchannel, outchannel, kernel_size=1, stride=stride, bias = False),

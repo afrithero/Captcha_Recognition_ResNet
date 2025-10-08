@@ -44,8 +44,47 @@ The directory named dataset should be placed under the root level of this reposi
 
 This project includes a reproducible preprocessing pipeline to (1) **augment** the training images and (2) **denoise** them for more robust training. The script is `src/data_preprocess.py`. It operates on three tasks stored under `dataset/train/{task1,task2,task3}`.
 ```bash
+cd src
 python data_preprocess.py
 ```
 
-## Coming Soon
-- How to train and evaluate.
+## Train the Model
+```bash
+cd src
+python main.py --mode train
+```
+
+## Evaluate the Model
+- Using a local checkpoint
+```bash
+cd src
+python main.py --mode evaluate --checkpoint [your checkpoint path]
+```
+- Using a registered MLflow model
+```bash
+cd src
+python main.py --mode evaluate --uri [your registered MLflow model uri]
+```
+
+## Predict
+- Using a local checkpoint
+```bash
+cd src
+python main.py --mode predict \
+  --checkpoint [your checkpoint path] \
+  --sample_submission [input csv path] \
+  --submission [output csv path]
+
+```
+
+- Using a registered MLflow model
+```bash
+cd src
+python main.py --mode predict \
+  --uri [your registered MLflow model uri] \
+  --sample_submission [input csv path] \
+  --submission [output csv path]
+
+```
+
+
