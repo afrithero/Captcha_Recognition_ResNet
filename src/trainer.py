@@ -1,23 +1,24 @@
 # src/trainer.py
 import os
 import torch
-from tqdm import tqdm
-import data_config, model_config
-from dataset import parse_annotation, split_train_val, CaptchaDataset
-from torch.utils.data import DataLoader
-from model import ResNet, ResidualBlock
-import data_encoding
 import numpy as np
 import pandas as pd
 import mlflow
 import mlflow.pytorch
+from tqdm import tqdm
+from data import constants
+from data import encoding
+from data.dataset import parse_annotation, split_train_val, CaptchaDataset
+from torch.utils.data import DataLoader
+from model.CNN import ResNet, ResidualBlock
 
 class Trainer:
-    def __init__(self, model, device, batch_size, epochs, 
+    def __init__(self, model, device, batch_size, epochs, save_freq,
                 save_dir, lr, val_batch_size=1, val_shuffle=False, val_drop_last=False):
 
         self.device = device
         self.epochs = epochs
+        self.save_freq = save_freq
         self.save_dir = save_dir
         self.batch_size = batch_size
         self.lr = lr
@@ -33,16 +34,16 @@ class Trainer:
         self.criterion = torch.nn.MultiLabelSoftMarginLoss()
 
         # split data and parse annotation
-        df = parse_annotation(data_config.ROOT_PATH)
+        df = parse_annotation(constants.ROOT_PATH)
         df_train, df_val = split_train_val(df, random_seed=42)
 
         self.train_loader = DataLoader(
-            CaptchaDataset(data_config.ROOT_PATH, df_train),
+            CaptchaDataset(constants.ROOT_PATH, df_train),
             batch_size=self.batch_size, shuffle=True,
             num_workers=4, drop_last=True)
         
         self.val_loader = DataLoader(
-            CaptchaDataset(data_config.ROOT_PATH, df_val),
+            CaptchaDataset(constants.ROOT_PATH, df_val),
             batch_size=val_batch_size, shuffle=val_shuffle,
             num_workers=4, drop_last=val_drop_last)
 
@@ -56,7 +57,7 @@ class Trainer:
                 total_loss = self._train_one_epoch(epoch)
                 mlflow.log_metric("train_loss", total_loss, step=epoch)
 
-                if (epoch + 1) % model_config.SAVE_FREQ == 0:
+                if (epoch + 1) % self.save_freq == 0:
                     checkpoint_path = os.path.join(
                         self.save_dir,
                         f"resnet_epoch_{epoch+1}.pkl")
@@ -114,17 +115,17 @@ class Trainer:
                 for images, labels, fnames in batches:
                     images = images.to(self.device)
                     preds  = self.model(images).cpu().numpy()
-                    true   = data_encoding.decode(labels.numpy()[0])
+                    true   = encoding.decode(labels.numpy()[0])
 
                     # slicing + argmax to rebuild pred_str
-                    ALL = data_config.ALL_CHAR_SET_LEN
+                    ALL = constants.ALL_CHAR_SET_LEN
                     chars = []
                     
                     for i in range(len(true)):
                         start = i*ALL
                         end = (i+1)*ALL
                         idx = np.argmax(preds[0, start:end])
-                        chars.append(data_config.INDEX_TO_CAPTCHA_DICT[idx])
+                        chars.append(constants.INDEX_TO_CAPTCHA_DICT[idx])
                     
                     pred_str = ''.join(chars)
 
@@ -152,14 +153,14 @@ class Trainer:
         df['label'] = df['filename'].apply(assign_label_len)
         return df
 
-    def predict(self, sample_submission_path, submission_path, checkpoint_path=None):
+    def predict(self, sample_submission_path, submission_path, checkpoint_path=None, model_uri=None):
         with mlflow.start_run(run_name="predict"):
             self._load_model(checkpoint_path, model_uri)
 
             self.model.eval()
 
             df_test = self._parse_submission(sample_submission_path)
-            test_ds = CaptchaDataset(data_config.ROOT_PATH, df_test, is_predict=True)
+            test_ds = CaptchaDataset(constants.ROOT_PATH, df_test, is_predict=True)
             test_dl = DataLoader(
                 test_ds,
                 batch_size=1,
@@ -176,12 +177,12 @@ class Trainer:
                     pred_probs = self.model(images).cpu().numpy()
                     length = int(labels.numpy()[0])
 
-                    ALL = data_config.ALL_CHAR_SET_LEN
+                    ALL = constants.ALL_CHAR_SET_LEN
                     chars = []
                     for i in range(length):
                         start, end = i*ALL, (i+1)*ALL
                         idx = np.argmax(pred_probs[0, start:end])
-                        chars.append(data_config.INDEX_TO_CAPTCHA_DICT[idx])
+                        chars.append(constants.INDEX_TO_CAPTCHA_DICT[idx])
                     pred_str = ''.join(chars)
                     preds.append(pred_str)
 

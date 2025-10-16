@@ -2,8 +2,8 @@ import cv2
 import scipy.ndimage
 import numpy as np
 import Augmentor
-import data_config
 import os
+from data import constants
 from os.path import join
 
 def remove_noise(img):
@@ -25,13 +25,13 @@ def generate_augmented_data(path, count):
 
 if __name__ == '__main__':
 	# Manually generate augmented data and then move the files.
-	task1_path = join(data_config.ROOT_PATH, "dataset", "train", "task1")
+	task1_path = join(constants.ROOT_PATH, "dataset", "train", "task1")
 	task1_count = len(os.listdir(task1_path))
 	p = generate_augmented_data(task1_path,task1_count)
-	task2_path = join(data_config.ROOT_PATH, "dataset", "train", "task2")
+	task2_path = join(constants.ROOT_PATH, "dataset", "train", "task2")
 	task2_count = len(os.listdir(task2_path))
 	p = generate_augmented_data(task2_path,task2_count)
-	task3_path = join(data_config.ROOT_PATH, "dataset", "train", "task3")
+	task3_path = join(constants.ROOT_PATH, "dataset", "train", "task3")
 	task3_count = len(os.listdir(task3_path))
 	p = generate_augmented_data(task3_path,task3_count)
 

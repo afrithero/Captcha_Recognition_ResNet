@@ -16,4 +16,4 @@ MAX_CAPTCHA = 4
 IMAGE_HEIGHT = 96
 IMAGE_WIDTH = 96
 
-ROOT_PATH = dirname(dirname(__file__))
+ROOT_PATH = dirname(dirname(dirname(__file__)))
