@@ -42,16 +42,16 @@ The directory named dataset should be placed under the root level of this reposi
 
 ## Data Preprocessing
 
-This project includes a reproducible preprocessing pipeline to (1) **augment** the training images and (2) **denoise** them for more robust training. The script is `src/data_preprocess.py`. It operates on three tasks stored under `dataset/train/{task1,task2,task3}`.
+This project includes a reproducible preprocessing pipeline to (1) **augment** the training images and (2) **denoise** them for more robust training. The script is `preprocess.py`. It operates on three tasks stored under `dataset/train/{task1,task2,task3}`.
 ```bash
 cd src
-python data_preprocess.py
+python preprocess.py
 ```
 
 ## Train the Model
 ```bash
 cd src
-python main.py --mode train
+python main.py --mode train --config [the training yaml config path]
 ```
 
 ## Evaluate the Model

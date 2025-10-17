@@ -2,10 +2,8 @@ import torch
 import cv2
 import numpy as np
 import pandas as pd
-import data_encoding
-import data_config
-import data_preprocess
 import glob
+from data import encoding
 from torch.utils.data import Dataset, DataLoader
 from os.path import join
 from sklearn.model_selection import train_test_split
@@ -20,7 +18,7 @@ class CaptchaDataset(Dataset):
 		if is_predict:
 			self.labels = np.array(raw_labels)
 		else:
-			self.labels = np.array([data_encoding.encode(label) for label in raw_labels])
+			self.labels = np.array([encoding.encode(label) for label in raw_labels])
 		
 	def __getitem__(self, index):
 		file_name, label = self.data[index], self.labels[index]

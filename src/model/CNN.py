@@ -1,10 +1,7 @@
 import torch.nn as nn
 import torch
-import data_config
-import model_config
-import data_encoding
 import torch.nn.functional as F
-from dataset import *
+from data.constants import *
 from tqdm import tqdm
 
 
@@ -46,7 +43,7 @@ class ResNet(nn.Module):
 		self.layer3 = self.make_layer(ResidualBlock, 256, 6, 2)
 		self.layer4 = self.make_layer(ResidualBlock, 512, 3, 2)
 		self.drop = nn.Dropout(0.5)
-		self.rfc = nn.Sequential(nn.Linear(512, data_config.MAX_CAPTCHA*data_config.ALL_CHAR_SET_LEN))
+		self.rfc = nn.Sequential(nn.Linear(512, MAX_CAPTCHA*ALL_CHAR_SET_LEN))
 		
 	def make_layer(self, block, channels, num_blocks, stride):
 		strides = [stride] + [1] * (num_blocks - 1)  # strides = [1,1], to determine the stride for each layer in one residual block
@@ -91,11 +88,11 @@ class CaptchaCNN(nn.Module):
 			nn.ReLU(),
 			nn.MaxPool2d(2))
 		self.fc = nn.Sequential(
-			nn.Linear((data_config.IMAGE_WIDTH//8)*(data_config.IMAGE_HEIGHT//8)*64, 1024),
+			nn.Linear((IMAGE_WIDTH//8)*(IMAGE_HEIGHT//8)*64, 1024),
 			nn.Dropout(0.5),
 			nn.ReLU())
 		self.rfc = nn.Sequential(
-			nn.Linear(1024, data_config.MAX_CAPTCHA*data_config.ALL_CHAR_SET_LEN))
+			nn.Linear(1024, MAX_CAPTCHA*ALL_CHAR_SET_LEN))
 
 	def forward(self, x):
 		out = self.layer1(x)
